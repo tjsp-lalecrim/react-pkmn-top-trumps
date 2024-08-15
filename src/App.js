@@ -1,17 +1,20 @@
 
-import './App.css';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from './components/Home';
+import Game from './components/Game';
+import Layout from "./components/Layout";
+import './App.css';
 
 function App() {
   return (
-    <div className="h-screen flex justify-center text-gray-300 bg-gray-950 ">
-      <div className="mx-auto mt-8 mx-2">
-        <h1 className="text-3xl text-emerald-600 font-bold text-center">
-          Pokemon Top Trumps
-        </h1>
-        <Home />
-      </div>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Home />} />
+          <Route path="game" element={<Game />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
