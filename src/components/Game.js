@@ -14,6 +14,7 @@ function useGameLogic() {
     const [yourCard, setYourCard] = useState(null);
     const [opponentCard, setOpponentCard] = useState(null);
     const [yourTurn, setYourTurn] = useState(false);
+    const [stat, setStat] = useState('');
     const [log, setLog] = useState([]);
 
     const initializePack = () => {
@@ -53,6 +54,8 @@ function useGameLogic() {
 
     const addLog = (message) => setLog(prevLog => [...prevLog, message]);
 
+    const handleStatCallBack = (stat) => addLog(`${stat} selected!`);
+
     const continueGame = () => {
         if (currentPack.length === 0) {
             initializePack();
@@ -69,21 +72,21 @@ function useGameLogic() {
         setYourTurn(!yourTurn);
     };
 
-    return { yourDeck, opponentDeck, yourCard, opponentCard, yourTurn, log, continueGame };
+    return { yourDeck, opponentDeck, yourCard, opponentCard, yourTurn, stat, log, handleStatCallBack, continueGame };
 }
 
 export default function Game() {
-    const { yourDeck, opponentDeck, yourCard, opponentCard, yourTurn, log, continueGame } = useGameLogic();
+    const { yourDeck, opponentDeck, yourCard, opponentCard, yourTurn, stat, log, handleStatCallBack, continueGame } = useGameLogic();
 
     return (
         <div className="flex flex-col">
             <div className="w-full bg-slate-50 text-center text-slate-950 rounded py-1 mt-4">
-                <p>{yourTurn ? 'Your Turn' : 'Opponent Turn'}</p>
+                <p>{yourTurn ? 'Your Turn' : 'Computer Turn'}</p>
             </div>
             <Score yourScore={yourDeck.length} opponentScore={opponentDeck.length} />
             <div id="cards" className="flex justify-between text-slate-950 gap-1 md:gap-4 lg:gap-8">
-                {yourCard ? <Card card={yourCard} /> : <HiddenCard />}
-                {opponentCard ? <Card card={opponentCard} /> : <HiddenCard />}
+                {yourCard ? <Card card={yourCard} stat={stat} handleStatCallBack={handleStatCallBack} /> : <HiddenCard />}
+                {opponentCard ? <Card card={opponentCard} handleStatCallBack={handleStatCallBack} /> : <HiddenCard />}
             </div>
             <div className="w-full flex">
                 <span className="w-full text-center">{yourCard?.type || '???'}</span>
