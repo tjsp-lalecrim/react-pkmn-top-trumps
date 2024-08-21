@@ -1,100 +1,101 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Card from './Card';
 import HiddenCard from "./HiddenCard";
 import Log from './Log';
 import Score from './Score';
-import { firstStagePack } from "../utils/PokemonCard";
+import { firstStagePack, midStagePack, lastStagePack } from "../utils/PokemonCard";
 
-export default function Game() {
+function useGameLogic() {
+    const [searchParams] = useSearchParams();
     const [currentPack, setCurrentPack] = useState([]);
     const [yourDeck, setYourDeck] = useState([]);
     const [opponentDeck, setOpponentDeck] = useState([]);
     const [yourCard, setYourCard] = useState(null);
     const [opponentCard, setOpponentCard] = useState(null);
-    const [yourTurn, setYourTurn] = useState(true);
+    const [yourTurn, setYourTurn] = useState(false);
     const [log, setLog] = useState([]);
 
-    const buildPack = () => {
-        setCurrentPack(firstStagePack);
+    const initializePack = () => {
+        const packValue = Number.parseInt(searchParams.get("pack")) || 1;
+        let selectedPack;
 
-        setCurrentPack((prevPack) => {
-            const shuffledCards = [...prevPack].sort(() => Math.random() - 0.5);
-            const half = Math.floor(shuffledCards.length / 2);
-            setYourDeck(shuffledCards.slice(0, half));
-            setOpponentDeck(shuffledCards.slice(half));
-            return prevPack;
+        switch (packValue) {
+            case 1:
+                selectedPack = firstStagePack;
+                break;
+            case 2:
+                selectedPack = midStagePack;
+                break;
+            case 3:
+                selectedPack = lastStagePack;
+                break;
+            default:
+                selectedPack = firstStagePack;
+        }
+
+        const shuffledCards = [...selectedPack].sort(() => Math.random() - 0.5);
+        const half = Math.floor(shuffledCards.length / 2);
+
+        setYourDeck(shuffledCards.slice(0, half));
+        setOpponentDeck(shuffledCards.slice(half));
+        setCurrentPack(shuffledCards);
+    };
+
+    const drawCard = (deck, setDeck, setCard, player) => {
+        setDeck(prevDeck => {
+            const [drawnCard, ...remainingDeck] = prevDeck;
+            setCard(drawnCard);
+            addLog(`${player} draw ${drawnCard?.name}`);
+            return remainingDeck;
         });
-    }
+    };
+
+    const addLog = (message) => setLog(prevLog => [...prevLog, message]);
 
     const continueGame = () => {
         if (currentPack.length === 0) {
-            buildPack();
+            initializePack();
         }
 
         if (yourTurn) {
-            drawYourCard();
+            drawCard(yourDeck, setYourDeck, setYourCard, "You");
+            setOpponentCard(null);
         } else {
-            drawOpponentCard();
+            drawCard(opponentDeck, setOpponentDeck, setOpponentCard, "Computer");
+            setYourCard(null);
         }
-    }
 
-    const drawYourCard = () => {
-        setYourDeck((prevDeck) => {
-            const [newYourCard, ...remainingYourDeck] = prevDeck;
-            setYourCard((newYourCard));
-            addLog(`You draw ${newYourCard?.name}`);
-            return remainingYourDeck;
-        });
+        setYourTurn(!yourTurn);
+    };
 
-    }
+    return { yourDeck, opponentDeck, yourCard, opponentCard, yourTurn, log, continueGame };
+}
 
-    const drawOpponentCard = () => {
-        setOpponentDeck((prevDeck) => {
-            const [newOpponentCard, ...remainingOpponentDeck] = prevDeck;
-            setOpponentCard(newOpponentCard);
-            addLog(`Computer draw ${newOpponentCard?.name}`);
-            return remainingOpponentDeck;
-        });
-    }
-
-    const addLog = (message) => setLog([...log, message]);
+export default function Game() {
+    const { yourDeck, opponentDeck, yourCard, opponentCard, yourTurn, log, continueGame } = useGameLogic();
 
     return (
         <div className="flex flex-col">
-            {/* Phase */}
             <div className="w-full bg-slate-50 text-center text-slate-950 rounded py-1 mt-4">
                 <p>{yourTurn ? 'Your Turn' : 'Opponent Turn'}</p>
             </div>
-
-            {/* Score */}
             <Score yourScore={yourDeck.length} opponentScore={opponentDeck.length} />
-
-            {/* Cards In-Game */}
             <div id="cards" className="flex justify-between text-slate-950 gap-1 md:gap-4 lg:gap-8">
-                {yourCard
-                    ? <Card card={yourCard} />
-                    : <HiddenCard />
-                }
-
-                {opponentCard
-                    ? <Card card={opponentCard} />
-                    : <HiddenCard />
-                }
+                {yourCard ? <Card card={yourCard} /> : <HiddenCard />}
+                {opponentCard ? <Card card={opponentCard} /> : <HiddenCard />}
             </div>
-
-            {/* Types */}
             <div className="w-full flex">
                 <span className="w-full text-center">{yourCard?.type || '???'}</span>
                 <span className="w-full text-center">{opponentCard?.type || '???'}</span>
             </div>
-
-            {/* Log */}
             <Log log={log} />
-
-            {/* Continue Button */}
-            <button type="button" className="text-white bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-emerald-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-                onClick={continueGame}>
-                {yourCard ? 'Continue' : 'Draw'}
+            <button
+                type="button"
+                className="text-white bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-emerald-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                onClick={continueGame}
+            >
+                Continue
             </button>
         </div>
     );
