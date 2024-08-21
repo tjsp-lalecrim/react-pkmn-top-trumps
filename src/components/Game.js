@@ -1,23 +1,53 @@
 import { useState } from "react";
-
 import Card from './Card';
 import Log from './Log';
 import Score from './Score';
-import { firstStagePack, midStagePack, lastStagePack } from "../utils/PokemonCard";
+import { firstStagePack } from "../utils/PokemonCard";
+import HiddenCard from "./HiddenCard";
 
 export default function Game() {
+    const [currentPack, setCurrentPack] = useState([]);
     const [yourTurn, setYourTurn] = useState(true);
     const [yourDeck, setYourDeck] = useState([]);
     const [opponentDeck, setOpponentDeck] = useState([]);
-    const [yourCard, setYourCard] = useState(firstStagePack[0]);
-    const [opponentCard, setOpponentCard] = useState(firstStagePack[3]);
-    const [log, setLog] = useState(
-        [
-            'Bug Attack is increased against Fire Defense',
-            'Attack VS. Defense',
-            '140 VS. 55',
-            'You win!'
-        ]);
+    const [yourCard, setYourCard] = useState(null);
+    const [opponentCard, setOpponentCard] = useState(null);
+    const [log, setLog] = useState([]);
+    const [gameOver, setGameOver] = useState(false);
+
+    const buildPack = () => {
+        setCurrentPack(firstStagePack);
+
+        setCurrentPack((prevPack) => {
+            const shuffledCards = [...prevPack].sort(() => Math.random() - 0.5);
+            const half = Math.floor(shuffledCards.length / 2);
+            setYourDeck(shuffledCards.slice(0, half));
+            setOpponentDeck(shuffledCards.slice(half));
+            return prevPack;
+        });
+    }
+
+    const continueGame = () => {
+        if (currentPack.length === 0) {
+            buildPack();
+        }
+
+        drawCards();
+    }
+
+    const drawCards = () => {
+        setYourDeck((prevDeck) => {
+            const [newYourCard, ...remainingYourDeck] = prevDeck;
+            setYourCard(newYourCard);
+            return remainingYourDeck;
+        });
+
+        setOpponentDeck((prevDeck) => {
+            const [newOpponentCard, ...remainingOpponentDeck] = prevDeck;
+            setOpponentCard(newOpponentCard);
+            return remainingOpponentDeck;
+        });
+    }
 
     return (
         <div className="flex flex-col">
@@ -31,29 +61,35 @@ export default function Game() {
 
             {/* Cards In-Game */}
             <div id="cards" className="flex justify-between text-slate-950 gap-1 md:gap-4 lg:gap-8">
-                <Card card={yourCard} />
-                <Card card={opponentCard} />
+                {yourCard
+                    ? <Card card={yourCard} />
+                    : <HiddenCard />
+                }
+
+                {opponentCard
+                    ? <Card card={opponentCard} />
+                    : <HiddenCard />
+                }
             </div>
 
             {/* Types */}
             <table>
                 <tbody>
                     <tr>
-                        <td className="text-center">Fire</td>
-                        <td className="text-center">Fire</td>
+                        <td className="text-center">{yourCard?.type}</td>
+                        <td className="text-center">{opponentCard?.type}</td>
                     </tr>
                 </tbody>
             </table>
-
 
             {/* Log */}
             <Log log={log} />
 
             {/* Continue Button */}
-            <button type="button" class="text-white bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-emerald-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2">
+            <button type="button" className="text-white bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-emerald-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                onClick={continueGame}>
                 Continue
             </button>
-
         </div>
     );
 }
