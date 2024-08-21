@@ -1,19 +1,18 @@
 import { useState } from "react";
 import Card from './Card';
+import HiddenCard from "./HiddenCard";
 import Log from './Log';
 import Score from './Score';
 import { firstStagePack } from "../utils/PokemonCard";
-import HiddenCard from "./HiddenCard";
 
 export default function Game() {
     const [currentPack, setCurrentPack] = useState([]);
-    const [yourTurn, setYourTurn] = useState(true);
     const [yourDeck, setYourDeck] = useState([]);
     const [opponentDeck, setOpponentDeck] = useState([]);
     const [yourCard, setYourCard] = useState(null);
     const [opponentCard, setOpponentCard] = useState(null);
+    const [yourTurn, setYourTurn] = useState(true);
     const [log, setLog] = useState([]);
-    const [gameOver, setGameOver] = useState(false);
 
     const buildPack = () => {
         setCurrentPack(firstStagePack);
@@ -32,22 +31,33 @@ export default function Game() {
             buildPack();
         }
 
-        drawCards();
+        if (yourTurn) {
+            drawYourCard();
+        } else {
+            drawOpponentCard();
+        }
     }
 
-    const drawCards = () => {
+    const drawYourCard = () => {
         setYourDeck((prevDeck) => {
             const [newYourCard, ...remainingYourDeck] = prevDeck;
-            setYourCard(newYourCard);
+            setYourCard((newYourCard));
+            addLog(`You draw ${newYourCard?.name}`);
             return remainingYourDeck;
         });
 
+    }
+
+    const drawOpponentCard = () => {
         setOpponentDeck((prevDeck) => {
             const [newOpponentCard, ...remainingOpponentDeck] = prevDeck;
             setOpponentCard(newOpponentCard);
+            addLog(`Computer draw ${newOpponentCard?.name}`);
             return remainingOpponentDeck;
         });
     }
+
+    const addLog = (message) => setLog([...log, message]);
 
     return (
         <div className="flex flex-col">
@@ -73,14 +83,10 @@ export default function Game() {
             </div>
 
             {/* Types */}
-            <table>
-                <tbody>
-                    <tr>
-                        <td className="text-center">{yourCard?.type}</td>
-                        <td className="text-center">{opponentCard?.type}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div className="w-full flex">
+                <span className="w-full text-center">{yourCard?.type || '???'}</span>
+                <span className="w-full text-center">{opponentCard?.type || '???'}</span>
+            </div>
 
             {/* Log */}
             <Log log={log} />
@@ -88,7 +94,7 @@ export default function Game() {
             {/* Continue Button */}
             <button type="button" className="text-white bg-gradient-to-r from-emerald-400 via-emerald-500 to-emerald-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-emerald-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
                 onClick={continueGame}>
-                Continue
+                {yourCard ? 'Continue' : 'Draw'}
             </button>
         </div>
     );
