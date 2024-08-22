@@ -1,6 +1,8 @@
+import { calculateTypeMultiplier } from './Type';
+
 export const stats = ['HP', 'Attack', 'Defense', 'SpecialAttack', 'SpecialDefense', 'Speed'];
 
-export default function getStatValue(card, stat) {
+export function getStatValue(card, stat) {
     const statProperty = {
         'HP': 'hp',
         'Attack': 'attack',
@@ -18,7 +20,7 @@ export default function getStatValue(card, stat) {
     return null;
 }
 
-export default function calculateStatMultiplier(offensiveCard, defensiveCard, stat) {
+export function calculateStatMultiplier(offensiveCard, defensiveCard, stat) {
     const requiredParams = [offensiveCard, defensiveCard, stat];
     if (requiredParams.some(param => !param)) {
         console.error('Missing offensiveCard, defensiveCard, or stat');
@@ -38,7 +40,7 @@ export default function calculateStatMultiplier(offensiveCard, defensiveCard, st
 }
 
 
-export default function getOpponentStat(selectedStat) {
+export function getOpponentStat(selectedStat) {
     const opponentStat = {
         'HP': 'HP',
         'Attack': 'Defense',
@@ -52,7 +54,7 @@ export default function getOpponentStat(selectedStat) {
 }
 
 
-export default function getHighestStat(card) {
+export function getHighestStat(card) {
     const stats = {
         hp: 'HP',
         attack: 'Attack',
