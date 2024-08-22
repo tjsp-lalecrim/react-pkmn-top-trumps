@@ -16,7 +16,11 @@ export default function Card(props) {
     }, [props.card]);
 
 
-    const handleStatSelected = (stat) => props.handleStatCallBack(stat);
+    const handleStatSelected = (stat) => {
+        if (props.active) {
+            props.handleStatCallBack(stat);
+        }
+    }
 
     return (
         <div id={`card-${props.card?.name}`} className='w-40 md:w-56 lg:w-64 bg-slate-50 rounded px-1 md:px-2 lg:px-4'>
@@ -26,27 +30,27 @@ export default function Card(props) {
             </div>
             <img className="w-full" src={pokemonImg} alt="Pokemon Card" />
             <ul id="card-options" className="list-none flex flex-col py-2 gap-1 lg:gap-2">
-                <li className="flex justify-between bg-slate-200 cursor-pointer" onClick={() => handleStatSelected('HP')}>
+                <li className={"flex justify-between bg-slate-200" + (props.active ? " cursor-pointer" : "")} onClick={() => handleStatSelected('HP')}>
                     <span>HP</span>
                     <span>{props.card.hp}</span>
                 </li>
-                <li className="flex justify-between bg-slate-200 cursor-pointer" onClick={() => handleStatSelected('Attack')}>
+                <li className={"flex justify-between bg-slate-200" + (props.active ? " cursor-pointer" : "")} onClick={() => handleStatSelected('Attack')}>
                     <span>Attack</span>
                     <span>{props.card.attack}</span>
                 </li>
-                <li className="flex justify-between bg-slate-200 cursor-pointer" onClick={() => handleStatSelected('Defense')}>
+                <li className={"flex justify-between bg-slate-200" + (props.active ? " cursor-pointer" : "")} onClick={() => handleStatSelected('Defense')}>
                     <span>Defense</span>
                     <span>{props.card.defense}</span>
                 </li>
-                <li className="flex justify-between bg-slate-200 cursor-pointer" onClick={() => handleStatSelected('Special Attack')}>
+                <li className={"flex justify-between bg-slate-200" + (props.active ? " cursor-pointer" : "")} onClick={() => handleStatSelected('Special Attack')}>
                     <span>Special Attack</span>
                     <span>{props.card.specialAttack}</span>
                 </li>
-                <li className="flex justify-between bg-slate-200 cursor-pointer" onClick={() => handleStatSelected('Special Defense')}>
+                <li className={"flex justify-between bg-slate-200" + (props.active ? " cursor-pointer" : "")} onClick={() => handleStatSelected('Special Defense')}>
                     <span>Special Defense</span>
                     <span>{props.card.specialDefense}</span>
                 </li>
-                <li className="flex justify-between bg-slate-200 cursor-pointer" onClick={() => handleStatSelected('Speed')}>
+                <li className={"flex justify-between bg-slate-200" + (props.active ? " cursor-pointer" : "")} onClick={() => handleStatSelected('Speed')}>
                     <span>Speed</span>
                     <span>{props.card.speed}</span>
                 </li>
