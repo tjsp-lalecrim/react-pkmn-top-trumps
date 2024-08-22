@@ -19,7 +19,7 @@ export const typeChart = {
     'Fairy': { 'Normal': 1.0, 'Fire': 0.5, 'Water': 1.0, 'Grass': 1.0, 'Electric': 1.0, 'Ice': 1.0, 'Fighting': 0.5, 'Poison': 2.0, 'Ground': 1.0, 'Flying': 1.0, 'Psychic': 1.0, 'Bug': 1.0, 'Rock': 1.0, 'Ghost': 1.0, 'Dragon': 2.0, 'Dark': 0.5, 'Steel': 2.0, 'Fairy': 1.0 },
 };
 
-export default function calculateTypeMultiplier(offensiveType, defensiveType) {
+export function calculateTypeMultiplier(offensiveType, defensiveType) {
     if (!offensiveType || !defensiveType) {
         const missingType = !offensiveType ? 'offensiveType' : 'defensiveType';
         console.error(`Missing ${missingType}`);
@@ -30,7 +30,7 @@ export default function calculateTypeMultiplier(offensiveType, defensiveType) {
     return multiplier;
 }
 
-export default function getHintByType(type) {
+export function getHintByType(type) {
     const hintChart = {
         'Normal': ['Normal', 'Flying', 'Fairy'],
         'Fire': ['Fire', 'Dragon'],
@@ -55,7 +55,7 @@ export default function getHintByType(type) {
     return hintChart[type] || [];
 }
 
-export default function writeTypeChartTable(typeChart) {
+export function writeTypeChartTable(typeChart) {
     const table = document.getElementById('type-chart');
     const types = Object.keys(typeChart);
     
@@ -78,5 +78,3 @@ export default function writeTypeChartTable(typeChart) {
     
     table.innerHTML = html;
 }
-
-writeTypeChartTable(typeChart);
